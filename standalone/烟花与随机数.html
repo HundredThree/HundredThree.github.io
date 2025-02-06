@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+        <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+        <title>烟花与随机数</title>
+
+        <style>
+            /* 页面基础样式 */
+            body {
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+                overflow: hidden;
+            }
+
+            /* 加载幕布样式 */
+            #loading {
+                outline: none;
+                border: none;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                font-size: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                width: 100%;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 9999;
+            }
+
+            /* 主内容样式 */
+            #wrapper {
+                display: none; /* 初始状态隐藏 */
+            }
+
+            .center {
+                text-align: center;
+                position: relative;
+                z-index: 2;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+            #fireworks {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                pointer-events: none;
+            }
+        </style>
+
+        <script type="module">
+            // 等待 PyScript 加载完成后隐藏加载幕布并显示主内容
+            const loadingDialog = document.getElementById('loading');
+            const wrapper = document.getElementById('wrapper');
+
+            addEventListener('py:ready', () => {
+                loadingDialog.remove(); // 从 DOM 中移除加载幕布
+                wrapper.style.display = "block"; // 显示主内容
+            });
+        </script>
+    </head>
+
+    <body>
+        <!-- 加载幕布 -->
+        <div id="loading">
+            <h1>Loading...</h1>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div id="wrapper">
+            <canvas id="fireworks"></canvas> <!-- 烟花特效的画布 -->
+
+            <div class="center">
+                <h1>PyScript with Random Numbers and Fireworks</h1>
+                <button id="show-random-btn">Generate Random Number and Fireworks</button>
+                <p id="random-number"></p>
+            </div>
+
+            <!-- 引入烟花特效的外部文件 -->
+            <script src="https://hundredthree.github.io/HT-JavaScript-Python/fireworks.js"></script>
+
+            <!-- 配置依赖 -->
+            <py-config>
+                packages = ["numpy"]
+            </py-config>
+
+            <!-- 引入 Python 文件 -->
+            <script type="py" src="https://hundredthree.github.io/HT-JavaScript-Python/烟花与随机数.py"></script>
+        </div>
+    </body>
+</html>

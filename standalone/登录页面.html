@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <style>
+        body {
+            margin: 0;
+            display: grid; /* 使用 grid 布局 */
+            place-items: center; /* 水平和垂直居中 */
+            height: 100vh;
+            background-color: #ffeef8;
+            color: #d5006d;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            display: flex; /* 使用 flexbox */
+            flex-direction: column; /* 垂直排列 */
+            align-items: center; /* 水平居中 */
+            background: rgba(255, 182, 193, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            width: 60%; /* 容器宽度占满整个页面 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        input {
+            text-align: center; /* 输入框内容居中 */
+            font-size: 18px;
+            padding: 8px;
+            margin: 10px 0;
+            width: 70%; /* 输入框宽度占满 */
+            border: 2px solid #d5006d;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            font-size: 18px;
+            padding: 8px;
+            width: 50%; /* 按钮宽度占满 */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #d5006d;
+            color: white;
+        }
+        button:hover {
+            background: #c4005a;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>要输入密码才能进入哦~~</h1>
+        <input type="password" id="password" placeholder="密码" onkeypress="checkEnter(event)">
+        <button onclick="checkPassword()">link start！！！</button>
+    </div>
+    <script>
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            const correctPassword = '130'; // 设置你的密码
+
+            if (password === correctPassword) {
+                localStorage.setItem('loggedIn', 'true');
+                window.location.href = '/'; // 登录成功后重定向到首页
+            } else {
+                alert('你的电波不对哦~~');
+            }
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                checkPassword(); // 按回车键时调用登录函数
+            }
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('loggedIn') === 'true') {
+                window.location.href = '/'; // 已登录则跳转到首页
+            }
+        }
+    </script>
+</body>
+</html>
+

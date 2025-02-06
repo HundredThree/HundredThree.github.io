@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 合并器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #drop-area {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #file-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f1f1f1;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .file-item button {
+            background-color: #ff5c5c;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .file-item button:hover {
+            background-color: #e34a4a;
+        }
+        .file-count {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF 合并器</h1>
+    
+    <!-- 显示选择的文件数量 -->
+    <div class="file-count">
+        已选择 <span id="file-count">0</span> 个文件
+    </div>
+    
+    <!-- 拖拽区域 -->
+    <div id="drop-area">将 PDF 文件拖拽到此区域，或点击下方按钮选择文件。</div>
+    
+    <!-- 文件选择按钮 -->
+    <input type="file" id="file-input" accept="application/pdf" multiple>
+    
+    <!-- 文件列表 -->
+    <ul id="file-list"></ul>
+    
+    <!-- 合并按钮 -->
+    <button id="merge-btn">合并 PDF 文件</button>
+
+    <script>
+        const fileInput = document.getElementById("file-input");
+        const mergeBtn = document.getElementById("merge-btn");
+        const fileListElement = document.getElementById("file-list");
+        const fileCountElement = document.getElementById("file-count");
+        
+        let files = [];
+
+        // 显示文件列表
+        function updateFileList() {
+            fileListElement.innerHTML = "";
+            files.forEach((file, index) => {
+                const li = document.createElement("li");
+                li.classList.add("file-item");
+                li.innerHTML = `${file.name} <button onclick="removeFile(${index})">删除</button>`;
+                fileListElement.appendChild(li);
+            });
+
+            // 更新文件数量显示
+            fileCountElement.textContent = files.length;
+        }
+
+        // 监听文件选择事件
+        fileInput.addEventListener("change", (event) => {
+            // 获取选中的文件，并避免清空已选文件
+            const newFiles = Array.from(event.target.files);
+            if (newFiles.length > 0) {
+                files = [...files, ...newFiles];
+                updateFileList();
+            }
+        });
+
+        // 监听拖拽事件
+        const dropArea = document.getElementById("drop-area");
+
+        dropArea.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            dropArea.style.backgroundColor = "#e1f7fe"; // 拖拽时的效果
+        });
+
+        dropArea.addEventListener("dragleave", () => {
+            dropArea.style.backgroundColor = "#f9f9f9"; // 拖拽离开时恢复
+        });
+
+        dropArea.addEventListener("drop", (event) => {
+            event.preventDefault();
+            dropArea.style.backgroundColor = "#f9f9f9"; // 恢复背景颜色
+            const newFiles = Array.from(event.dataTransfer.files);
+            files = [...files, ...newFiles];
+            updateFileList();
+        });
+
+        // 删除文件
+        function removeFile(index) {
+            files.splice(index, 1); // 从数组中删除文件
+            updateFileList(); // 更新文件列表
+        }
+
+        // 合并 PDF 文件
+        async function mergePDFs() {
+            if (files.length === 0) {
+                alert("请先选择 PDF 文件！");
+                return;
+            }
+
+            const pdfDoc = await PDFLib.PDFDocument.create();
+
+            for (const file of files) {
+                const arrayBuffer = await file.arrayBuffer();
+                const donorPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const pages = await pdfDoc.copyPages(donorPdfDoc, donorPdfDoc.getPageIndices());
+
+                for (const page of pages) {
+                    pdfDoc.addPage(page);
+                }
+            }
+
+            const mergedPdfBytes = await pdfDoc.save();
+
+            // 创建 Blob 并下载
+            const blob = new Blob([mergedPdfBytes], { type: "application/pdf" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "merged_output.pdf";
+            link.click();
+        }
+
+        // 绑定合并按钮事件
+        mergeBtn.addEventListener("click", mergePDFs);
+    </script>
+</body>
+</html>
